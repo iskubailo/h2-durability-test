@@ -33,8 +33,9 @@ public class DataController {
   }
 
   @RequestMapping("/select")
-  public List<DataEntity> select() {
-    return dataRepository.findAll(PageRequest.of(0, 10, Direction.DESC, "id")).getContent();
+  public DataDto select() {
+    List<DataEntity> list = dataRepository.findAll(PageRequest.of(0, 10, Direction.DESC, "id")).getContent();
+    return new DataDto(list);
   }
 
   @GetMapping("/exit")

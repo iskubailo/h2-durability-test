@@ -12,6 +12,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import com.iskubailo.h2durabilitytest.H2DurabilityTestApplication;
+import com.iskubailo.h2durabilitytest.child.DataDto;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,8 +35,9 @@ public class ChildManager {
     }
     log.info("Rest Request...");
     try {
-      String response = restTemplate.getForObject("http://localhost:8080/select", String.class);
+      DataDto response = restTemplate.getForObject("http://localhost:8080/select", DataDto.class);
       log.info("Rest Response: " + response);
+      log.info("Last Entity: " + response.getList().stream().findFirst());
       return ChildState.UP;
     } catch (RestClientException e) {
       log.info("Rest Error: " + e);
