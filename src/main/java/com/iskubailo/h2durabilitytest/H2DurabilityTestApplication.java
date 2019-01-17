@@ -1,13 +1,13 @@
 package com.iskubailo.h2durabilitytest;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
+import com.iskubailo.h2durabilitytest.child.ChildApplication;
+
 public class H2DurabilityTestApplication {
 
   public static void main(String[] args) {
-    SpringApplication.run(H2DurabilityTestApplication.class, args);
+    SpringApplication.run(ChildApplication.class, args);
   }
 
 }
