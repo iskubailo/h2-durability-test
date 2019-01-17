@@ -4,13 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
+import java.util.Map;
 import java.util.Scanner;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
-
-import com.iskubailo.h2durabilitytest.H2DurabilityTestApplication;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,16 +33,18 @@ public class ChildManager {
     log.debug("Rest Request...");
     try {
       String response = restClient.helth();
-      log.debug("Rest Response: " + response);
+      log.debug("Rest Response: {}", response);
       return ChildState.UP;
     } catch (RestClientException e) {
-      log.debug("Rest Error: " + e);
+      log.debug("Rest Error: {}", e.toString());
       return ChildState.RUNNING;
     }
   }
   
   public void start() throws IOException {
-    process = Runtime.getRuntime().exec(getForkCommand());
+    String command = getForkCommand();
+    log.debug("Command: {}", command);
+    process = Runtime.getRuntime().exec(command);
     read("OUTPUT", process.getInputStream());
     read("ERROR", process.getErrorStream());
   }
@@ -59,11 +60,25 @@ public class ChildManager {
     StringBuilder cmd = new StringBuilder();
     cmd.append(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java ");
     for (String jvmArg : ManagementFactory.getRuntimeMXBean().getInputArguments()) {
-        cmd.append(jvmArg + " ");
+      if (jvmArg.contains("agentlib:jdwp")) {
+        jvmArg = "-Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=8000,suspend=n";
+      } else if (jvmArg.contains("-javaagent:/Applications/Eclipse")) {
+        jvmArg = "";
+      }
+      cmd.append(jvmArg + " ");
     }
     cmd.append("-cp ").append(ManagementFactory.getRuntimeMXBean().getClassPath()).append(" ");
-    cmd.append(H2DurabilityTestApplication.class.getName()).append(" child");
+    String mainClass = getMainClass();
+    log.debug("MainClass: {}", mainClass);
+    cmd.append(mainClass).append(" child");
     return cmd.toString();
+  }
+  
+  private static String getMainClass() {
+    for (final Map.Entry<String, String> entry : System.getenv().entrySet())
+      if (entry.getKey().startsWith("JAVA_MAIN_CLASS")) // like JAVA_MAIN_CLASS_13328
+        return entry.getValue();
+    throw new IllegalStateException("Cannot determine main class.");
   }
 
   private static void read(String name, InputStream inputStream) {

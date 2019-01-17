@@ -40,8 +40,6 @@ public class ParentApplicationRunner implements CommandLineRunner {
   }
 
   private void runTest() throws Exception {
-    context.nextTest();
-    
     log.info("Starting H2 app...");
     childManager.start();
     repeatUntil(() -> childManager.getState() == ChildState.UP);
@@ -78,6 +76,7 @@ public class ParentApplicationRunner implements CommandLineRunner {
     } catch(RestClientException e) {
       log.error("Communication Error", e);
     } finally {
+      context.nextTest();
       childManager.kill();
     }
   }
@@ -92,7 +91,7 @@ public class ParentApplicationRunner implements CommandLineRunner {
     while (!finished) {
       finished = callable.call();
       if (!finished) {
-        TimeUnit.MILLISECONDS.sleep(200);
+        TimeUnit.MILLISECONDS.sleep(1000);
       }
     }
   }
