@@ -19,8 +19,8 @@ public class ParentApplication {
   @Bean
   public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
     return restTemplateBuilder
-        .setConnectTimeout(Duration.ofMillis(200))
-        .setReadTimeout(Duration.ofMillis(200))
+        .setConnectTimeout(Duration.ofSeconds(3))
+        .setReadTimeout(Duration.ofSeconds(3))
         .build();
   }
 }

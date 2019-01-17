@@ -3,6 +3,7 @@ package com.iskubailo.h2durabilitytest.child;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
@@ -34,19 +35,30 @@ public class DataController {
 
   @RequestMapping("/select")
   public DataDto select() {
-    List<DataEntity> list = dataRepository.findAll(PageRequest.of(0, 10, Direction.DESC, "id")).getContent();
+    List<DataEntity> list = dataRepository.findAll(PageRequest.of(0, 3, Direction.DESC, "id")).getContent();
     return new DataDto(list);
   }
 
   @GetMapping("/exit")
   public String exit() {
-    System.exit(0);
-    return "System.exit(0)";
+    execDelayed(() -> System.exit(0));
+    return "OK - System.exit(0) in 5 sec";
   }
   
   @GetMapping("/halt")
   public String halt() {
-    Runtime.getRuntime().halt(0);
-    return "Runtime.getRuntime().halt(0)";
+    execDelayed(() -> Runtime.getRuntime().halt(0));
+    return "OK - Runtime.getRuntime().halt(0) in 5 sec";
+  }
+  
+  private void execDelayed(Runnable runnable) {
+    new Thread(() -> {
+      try {
+        TimeUnit.SECONDS.sleep(5);
+      } catch (InterruptedException e) {
+        // ignore
+      }
+      runnable.run();
+    }).start();
   }
 }

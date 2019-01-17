@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 
 import com.iskubailo.h2durabilitytest.H2DurabilityTestApplication;
-import com.iskubailo.h2durabilitytest.child.DataDto;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,14 +31,13 @@ public class ChildManager {
     if (process == null || !process.isAlive()) {
       return ChildState.DOWN;
     }
-    log.info("Rest Request...");
+    log.debug("Rest Request...");
     try {
-      DataDto response = restClient.select();
-      log.info("Rest Response: " + response);
-      log.info("Last Entity: " + response.getList().stream().findFirst());
+      String response = restClient.helth();
+      log.debug("Rest Response: " + response);
       return ChildState.UP;
     } catch (RestClientException e) {
-      log.info("Rest Error: " + e);
+      log.debug("Rest Error: " + e);
       return ChildState.RUNNING;
     }
   }
@@ -50,8 +48,9 @@ public class ChildManager {
     read("ERROR", process.getErrorStream());
   }
   
-  public void destroy() throws IOException {
-    if (process != null) {
+  public void kill() throws IOException {
+    if (process != null && process.isAlive()) {
+      log.warn("Kill H2 app");
       process.destroy();
     }
   }
@@ -70,11 +69,11 @@ public class ChildManager {
   private static void read(String name, InputStream inputStream) {
     Scanner scanner = new Scanner(inputStream);
     Runnable task = () -> {
-      log.info("MAIN: Read " + name + " - started");
+      log.debug("MAIN: Read " + name + " - started");
       while (scanner.hasNextLine()) {
-        log.info(name + ": " + scanner.nextLine());
+        log.debug(name + ": " + scanner.nextLine());
       }
-      log.info("MAIN: Read " + name + " - finished");
+      log.debug("MAIN: Read " + name + " - finished");
     };
     new Thread(task).start();
   }
