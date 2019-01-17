@@ -9,7 +9,6 @@ import java.util.Scanner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 
 import com.iskubailo.h2durabilitytest.H2DurabilityTestApplication;
 import com.iskubailo.h2durabilitytest.child.DataDto;
@@ -20,13 +19,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ChildManager {
   
-  private final RestTemplate restTemplate;
+  private final RestClient restClient;
   
   private Process process;
   
   @Autowired
-  public ChildManager(RestTemplate restTemplate) {
-    this.restTemplate = restTemplate;
+  public ChildManager(RestClient restClient) {
+    this.restClient = restClient;
   }
   
   public ChildState getState() {
@@ -35,7 +34,7 @@ public class ChildManager {
     }
     log.info("Rest Request...");
     try {
-      DataDto response = restTemplate.getForObject("http://localhost:8080/select", DataDto.class);
+      DataDto response = restClient.select();
       log.info("Rest Response: " + response);
       log.info("Last Entity: " + response.getList().stream().findFirst());
       return ChildState.UP;
