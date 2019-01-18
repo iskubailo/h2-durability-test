@@ -59,6 +59,13 @@ public class ChildManager {
     }
   }
   
+  public void killForcibly() throws IOException {
+    if (process != null && process.isAlive()) {
+      log.warn("Kill Forcibly H2 app");
+      process.destroyForcibly();
+    }
+  }
+  
   private String getForkCommand() {
     StringBuilder cmd = new StringBuilder();
     cmd.append(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java ");

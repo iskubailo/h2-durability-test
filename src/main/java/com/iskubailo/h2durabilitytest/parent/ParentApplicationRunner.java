@@ -102,7 +102,9 @@ public class ParentApplicationRunner implements CommandLineRunner {
         case "stop-halt":
           return new StopMethod("HALT", restClient::halt);
         case "stop-kill":
-          return new StopMethod("EXIT", this::kill);
+          return new StopMethod("KILL", this::kill);
+        case "stop-kill-f":
+          return new StopMethod("KILL-Forcibly", this::killForcibly);
         default:
           // ignore
       }
@@ -112,6 +114,11 @@ public class ParentApplicationRunner implements CommandLineRunner {
   
   private String kill() throws IOException {
     childManager.kill();
+    return "No response";
+  }
+
+  private String killForcibly() throws IOException {
+    childManager.killForcibly();
     return "No response";
   }
 
