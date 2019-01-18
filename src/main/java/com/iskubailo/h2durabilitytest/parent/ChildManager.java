@@ -26,20 +26,20 @@ public class ChildManager {
     this.restClient = restClient;
   }
   
-  public ChildStatus getState() {
+  public ChildStatus getStatus() {
     if (process == null || !process.isAlive()) {
-      log.debug("STATE: DOWN");
+      log.debug("STATUS: DOWN");
       return ChildStatus.DOWN;
     }
     log.trace("Rest Request...");
     try {
       String response = restClient.helth();
       log.trace("Rest Response: {}", response);
-      log.debug("STATE: UP");
+      log.debug("STATUS: UP");
       return ChildStatus.UP;
     } catch (RestClientException e) {
       log.trace("Rest Error: {}", e.toString());
-      log.debug("STATE: RUNNING");
+      log.debug("STATUS: RUNNING");
       return ChildStatus.RUNNING;
     }
   }

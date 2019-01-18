@@ -46,7 +46,7 @@ public class ParentApplicationRunner implements CommandLineRunner {
   private void runTest() throws Exception {
     log.info("Starting H2 app...");
     childManager.start();
-    repeatUntil(() -> childManager.getState() == ChildStatus.UP);
+    repeatUntil(() -> childManager.getStatus() == ChildStatus.UP);
     
     try {
 
@@ -71,7 +71,7 @@ public class ParentApplicationRunner implements CommandLineRunner {
       String halted = restClient.exit();
       log.info("Exit: " + halted);
       
-      repeatUntil(() -> childManager.getState() == ChildStatus.DOWN);
+      repeatUntil(() -> childManager.getStatus() == ChildStatus.DOWN);
       log.info("H2 app down");
       
       log.info("Result: " + context);
