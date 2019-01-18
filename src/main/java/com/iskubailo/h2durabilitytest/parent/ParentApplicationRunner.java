@@ -34,6 +34,7 @@ public class ParentApplicationRunner implements CommandLineRunner {
   
   @Override
   public void run(String... args) throws Exception {
+    log.info("--------------------------------------------------");
     while (true) {
       runTest();
     }
@@ -50,10 +51,10 @@ public class ParentApplicationRunner implements CommandLineRunner {
       log.info("Selected: " + selected);
       if (context.getLastId() > 0) {
         if (lastIdValid(selected)) {
-          log.info("Last Test: SUCCESS");
+          log.info("Test: SUCCESS");
           context.succeed();
         } else {
-          log.info("Last Test: FAILURE");
+          log.info("Test: FAILURE");
           context.failed();
         }
       } else {
@@ -64,8 +65,8 @@ public class ParentApplicationRunner implements CommandLineRunner {
       log.info("Inserted: " + inserted);
       context.setLastId(inserted.getId());
       
-      String halted = restClient.halt();
-      log.info("Halt: " + halted);
+      String halted = restClient.exit();
+      log.info("Exit: " + halted);
       
       repeatUntil(() -> childManager.getState() == ChildState.DOWN);
       log.info("H2 app down");
