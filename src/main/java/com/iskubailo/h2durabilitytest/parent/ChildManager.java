@@ -31,15 +31,18 @@ public class ChildManager {
   
   public ChildState getState() {
     if (process == null || !process.isAlive()) {
+      log.debug("STATE: DOWN");
       return ChildState.DOWN;
     }
-    log.debug("Rest Request...");
+    log.trace("Rest Request...");
     try {
       String response = restClient.helth();
-      log.debug("Rest Response: {}", response);
+      log.trace("Rest Response: {}", response);
+      log.debug("STATE: UP");
       return ChildState.UP;
     } catch (RestClientException e) {
-      log.debug("Rest Error: {}", e.toString());
+      log.trace("Rest Error: {}", e.toString());
+      log.debug("STATE: RUNNING");
       return ChildState.RUNNING;
     }
   }
