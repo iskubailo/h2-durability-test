@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Scanner;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,6 +90,14 @@ public class ChildManager {
   }
   
   private String getMainClass() {
+    Optional<String> mainClass = Arrays.stream(GlobalStorage.originalArguments)
+        .filter(arg -> arg.startsWith("main:"))
+        .map(arg -> arg.substring(5))
+        .findFirst();
+    if (mainClass.isPresent()) {
+      log.trace("Forced main class");
+      return mainClass.get();
+    }
     for (final Map.Entry<String, String> entry : System.getenv().entrySet()) {
       if (entry.getKey().startsWith("JAVA_MAIN_CLASS")) { // like JAVA_MAIN_CLASS_13328
         return entry.getValue();
