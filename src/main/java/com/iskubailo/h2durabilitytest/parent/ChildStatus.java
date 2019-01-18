@@ -1,5 +1,5 @@
 package com.iskubailo.h2durabilitytest.parent;
 
-public enum ChildState {
+public enum ChildStatus {
   DOWN, RUNNING, UP
 }
