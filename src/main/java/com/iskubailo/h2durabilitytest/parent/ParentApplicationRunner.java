@@ -15,6 +15,7 @@ import org.springframework.web.client.RestClientException;
 
 import com.iskubailo.h2durabilitytest.child.DataDto;
 import com.iskubailo.h2durabilitytest.child.DataEntity;
+import com.iskubailo.h2durabilitytest.parent.ChildManager.ChildStatus;
 
 import lombok.extern.slf4j.Slf4j;
 

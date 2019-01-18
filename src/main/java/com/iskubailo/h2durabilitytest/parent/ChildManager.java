@@ -97,4 +97,9 @@ public class ChildManager {
     };
     new Thread(task).start();
   }
+  
+  public static enum ChildStatus {
+    DOWN, RUNNING, UP
+  }
+
 }
