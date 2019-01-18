@@ -2,6 +2,7 @@ package com.iskubailo.h2durabilitytest;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
@@ -16,10 +17,16 @@ public class H2DurabilityTestApplication {
     Optional<String> child = Arrays.stream(args).filter("child"::equalsIgnoreCase).findFirst();
     
     if (child.isPresent()) {
-      SpringApplication.run(ChildApplication.class, args);
+      String[] childArgs = filterArgs(args, "parent:");
+      SpringApplication.run(ChildApplication.class, childArgs);
     } else {
-      new SpringApplicationBuilder(ParentApplication.class).web(WebApplicationType.NONE).run(args);
+      String[] parentArgs = filterArgs(args, "child:");
+      new SpringApplicationBuilder(ParentApplication.class).web(WebApplicationType.NONE).run(parentArgs);
     }
+  }
+  
+  private static String[] filterArgs(String[] source, String prefix) {
+    return Stream.of(source).filter(arg -> !arg.startsWith(prefix)).toArray(i -> new String[i]);
   }
 
 }
