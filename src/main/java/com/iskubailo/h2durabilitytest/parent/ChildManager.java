@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Scanner;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.ApplicationArguments;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 
@@ -18,14 +17,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ChildManager {
   
-  private final ApplicationArguments arguments;
   private final RestClient restClient;
   
   private Process process;
   
   @Autowired
-  public ChildManager(ApplicationArguments arguments, RestClient restClient) {
-    this.arguments = arguments;
+  public ChildManager(RestClient restClient) {
     this.restClient = restClient;
   }
   
@@ -75,8 +72,7 @@ public class ChildManager {
     String mainClass = getMainClass();
     log.debug("MainClass: {}", mainClass);
     cmd.append(mainClass).append(" child ");
-    String[] args = arguments.getSourceArgs();
-    for (String arg : args) {
+    for (String arg : GlobalStorage.originalArguments) {
       cmd.append(arg).append(" ");
     }
     return cmd.toString();

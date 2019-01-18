@@ -1,5 +1,6 @@
 package com.iskubailo.h2durabilitytest.parent;
 
+import java.util.Arrays;
 import java.util.OptionalLong;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -35,6 +36,8 @@ public class ParentApplicationRunner implements CommandLineRunner {
   @Override
   public void run(String... args) throws Exception {
     log.info("--------------------------------------------------");
+    log.debug("Original Arguments: " + Arrays.toString(GlobalStorage.originalArguments));
+    log.debug("Parent Arguments: " + Arrays.toString(args));
     while (true) {
       runTest();
     }

@@ -12,7 +12,7 @@ public class RestClient {
   private final RestTemplate restTemplate;
   private final String serverPort;
 
-  public RestClient(RestTemplate restTemplate, @Value("${server.port}") String serverPort) {
+  public RestClient(RestTemplate restTemplate, @Value("${server.port:8080}") String serverPort) {
     this.restTemplate = restTemplate;
     this.serverPort = serverPort;
   }
