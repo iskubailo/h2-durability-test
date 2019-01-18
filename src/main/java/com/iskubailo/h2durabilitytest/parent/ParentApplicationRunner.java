@@ -1,5 +1,6 @@
 package com.iskubailo.h2durabilitytest.parent;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.OptionalLong;
 import java.util.concurrent.Callable;
@@ -17,6 +18,7 @@ import com.iskubailo.h2durabilitytest.child.DataDto;
 import com.iskubailo.h2durabilitytest.child.DataEntity;
 import com.iskubailo.h2durabilitytest.parent.ChildManager.ChildStatus;
 
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 @SpringBootApplication
@@ -39,12 +41,14 @@ public class ParentApplicationRunner implements CommandLineRunner {
     log.info("--------------------------------------------------");
     log.debug("Original Arguments: " + Arrays.toString(GlobalStorage.originalArguments));
     log.debug("Parent Arguments: " + Arrays.toString(args));
+    StopMethod stopMethod = getStopMethod(args);
+    log.info("Stop method: " + stopMethod.getDescription());
     while (true) {
-      runTest();
+      runTest(stopMethod);
     }
   }
 
-  private void runTest() throws Exception {
+  private void runTest(StopMethod stopMethod) throws Exception {
     log.info("Starting H2 app...");
     childManager.start();
     repeatUntil(() -> childManager.getStatus() == ChildStatus.UP);
@@ -62,15 +66,16 @@ public class ParentApplicationRunner implements CommandLineRunner {
           context.failed();
         }
       } else {
-        log.info("Last Test: No result (first run)");
+        log.info("Test: No result (first run)");
       }
       
       DataEntity inserted = restClient.insert();
       log.info("Inserted: " + inserted);
       context.setLastId(inserted.getId());
       
-      String halted = restClient.exit();
-      log.info("Exit: " + halted);
+      log.info("Stopping H2 app with {} method...", stopMethod.getDescription());
+      String stopResponse = stopMethod.getMethod().call();
+      log.info("Stop response: {}", stopResponse);
       
       repeatUntil(() -> childManager.getStatus() == ChildStatus.DOWN);
       log.info("H2 app down");
@@ -86,6 +91,30 @@ public class ParentApplicationRunner implements CommandLineRunner {
     }
   }
 
+  private StopMethod getStopMethod(String... args) {
+    for (String arg : args) {
+      if (!arg.startsWith("stop-")) {
+        continue;
+      }
+      switch(arg) {
+        case "stop-exit":
+          return new StopMethod("EXIT", restClient::exit);
+        case "stop-halt":
+          return new StopMethod("HALT", restClient::halt);
+        case "stop-kill":
+          return new StopMethod("EXIT", this::kill);
+        default:
+          // ignore
+      }
+    }
+    return new StopMethod("EXIT (Default)", restClient::exit);
+  }
+  
+  private String kill() throws IOException {
+    childManager.kill();
+    return "No response";
+  }
+
   private boolean lastIdValid(DataDto dataDto) {
     OptionalLong lastId = dataDto.getList().stream().mapToLong(DataEntity::getId).findFirst();
     return (lastId.isPresent() && lastId.getAsLong() == context.getLastId());
@@ -99,6 +128,12 @@ public class ParentApplicationRunner implements CommandLineRunner {
         TimeUnit.MILLISECONDS.sleep(1000);
       }
     }
+  }
+  
+  @Data
+  private static class StopMethod {
+    private final String description;
+    private final Callable<String> method;
   }
 
 }
