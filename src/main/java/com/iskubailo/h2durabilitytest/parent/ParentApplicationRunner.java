@@ -38,11 +38,11 @@ public class ParentApplicationRunner implements CommandLineRunner {
   
   @Override
   public void run(String... args) throws Exception {
-    log.info("--------------------------------------------------");
     log.debug("Original Arguments: " + Arrays.toString(GlobalStorage.originalArguments));
     log.debug("Parent Arguments: " + Arrays.toString(args));
     StopMethod stopMethod = getStopMethod(args);
     log.info("Stop method: " + stopMethod.getDescription());
+    log.info("--------------------------------------------------");
     while (true) {
       runTest(stopMethod);
     }

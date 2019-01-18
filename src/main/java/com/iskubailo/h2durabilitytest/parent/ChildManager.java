@@ -71,9 +71,11 @@ public class ChildManager {
     cmd.append(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java ");
     for (String jvmArg : ManagementFactory.getRuntimeMXBean().getInputArguments()) {
       if (jvmArg.contains("agentlib:jdwp") || jvmArg.contains("-Xrunjdwp:") || jvmArg.contains("-javaagent:")) {
-        jvmArg = "";
+        log.trace("Skip argument: {}", jvmArg);
+      } else {
+        log.trace("Use argument: {}", jvmArg);
+        cmd.append(jvmArg + " ");
       }
-      cmd.append(jvmArg + " ");
     }
     cmd.append("-cp ").append(ManagementFactory.getRuntimeMXBean().getClassPath()).append(" ");
     String mainClass = getMainClass();
@@ -86,9 +88,13 @@ public class ChildManager {
   }
   
   private String getMainClass() {
-    for (final Map.Entry<String, String> entry : System.getenv().entrySet())
-      if (entry.getKey().startsWith("JAVA_MAIN_CLASS")) // like JAVA_MAIN_CLASS_13328
+    for (final Map.Entry<String, String> entry : System.getenv().entrySet()) {
+      if (entry.getKey().startsWith("JAVA_MAIN_CLASS")) { // like JAVA_MAIN_CLASS_13328
         return entry.getValue();
+      } else {
+        log.trace("Skip system environment, not a main class: {}={}", entry.getKey(), entry.getValue());
+      }
+    }
     throw new IllegalStateException("Cannot determine main class.");
   }
 
