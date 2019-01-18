@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 
@@ -17,12 +18,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ChildManager {
   
+  private final ApplicationArguments arguments;
   private final RestClient restClient;
   
   private Process process;
   
   @Autowired
-  public ChildManager(RestClient restClient) {
+  public ChildManager(ApplicationArguments arguments, RestClient restClient) {
+    this.arguments = arguments;
     this.restClient = restClient;
   }
   
@@ -56,7 +59,7 @@ public class ChildManager {
     }
   }
   
-  private static String getForkCommand() {
+  private String getForkCommand() {
     StringBuilder cmd = new StringBuilder();
     cmd.append(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java ");
     for (String jvmArg : ManagementFactory.getRuntimeMXBean().getInputArguments()) {
@@ -68,18 +71,22 @@ public class ChildManager {
     cmd.append("-cp ").append(ManagementFactory.getRuntimeMXBean().getClassPath()).append(" ");
     String mainClass = getMainClass();
     log.debug("MainClass: {}", mainClass);
-    cmd.append(mainClass).append(" child");
+    cmd.append(mainClass).append(" child ");
+    String[] args = arguments.getSourceArgs();
+    for (String arg : args) {
+      cmd.append(arg).append(" ");
+    }
     return cmd.toString();
   }
   
-  private static String getMainClass() {
+  private String getMainClass() {
     for (final Map.Entry<String, String> entry : System.getenv().entrySet())
       if (entry.getKey().startsWith("JAVA_MAIN_CLASS")) // like JAVA_MAIN_CLASS_13328
         return entry.getValue();
     throw new IllegalStateException("Cannot determine main class.");
   }
 
-  private static void read(String name, InputStream inputStream) {
+  private void read(String name, InputStream inputStream) {
     Runnable task = () -> {
       try (Scanner scanner = new Scanner(inputStream)) {
         log.debug("MAIN: Read " + name + " - started");
