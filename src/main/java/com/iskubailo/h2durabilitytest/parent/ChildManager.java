@@ -60,9 +60,7 @@ public class ChildManager {
     StringBuilder cmd = new StringBuilder();
     cmd.append(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java ");
     for (String jvmArg : ManagementFactory.getRuntimeMXBean().getInputArguments()) {
-      if (jvmArg.contains("agentlib:jdwp")) {
-        jvmArg = "-Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=8000,suspend=n";
-      } else if (jvmArg.contains("-javaagent:/Applications/Eclipse")) {
+      if (jvmArg.contains("agentlib:jdwp") || jvmArg.contains("-Xrunjdwp:") || jvmArg.contains("-javaagent:")) {
         jvmArg = "";
       }
       cmd.append(jvmArg + " ");
