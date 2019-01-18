@@ -80,13 +80,14 @@ public class ChildManager {
   }
 
   private static void read(String name, InputStream inputStream) {
-    Scanner scanner = new Scanner(inputStream);
     Runnable task = () -> {
-      log.debug("MAIN: Read " + name + " - started");
-      while (scanner.hasNextLine()) {
-        log.debug(name + ": " + scanner.nextLine());
+      try (Scanner scanner = new Scanner(inputStream)) {
+        log.debug("MAIN: Read " + name + " - started");
+        while (scanner.hasNextLine()) {
+          log.debug(name + ": " + scanner.nextLine());
+        }
+        log.debug("MAIN: Read " + name + " - finished");
       }
-      log.debug("MAIN: Read " + name + " - finished");
     };
     new Thread(task).start();
   }
