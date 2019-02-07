@@ -87,4 +87,4 @@ java -jar h2-durability-test-0.0.1-SNAPSHOT.jar main:org.springframework.boot.lo
 
 ### Test results
 
-[See test results](results/README.md)
+[See test results](results/test-results.md)
