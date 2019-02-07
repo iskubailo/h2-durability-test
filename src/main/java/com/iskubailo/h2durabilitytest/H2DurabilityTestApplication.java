@@ -3,7 +3,6 @@ package com.iskubailo.h2durabilitytest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
@@ -20,15 +19,17 @@ public class H2DurabilityTestApplication {
   
   public static void main(String[] args) {
     GlobalStorage.originalArguments = args;
-    Optional<String> child = Arrays.stream(args).filter("child"::equalsIgnoreCase).findFirst();
-    
-    if (child.isPresent()) {
+    if (hasChildParameter(args)) {
       String[] childArgs = filterArgs(args, false);
       SpringApplication.run(ChildApplication.class, childArgs);
     } else {
       String[] parentArgs = filterArgs(args, true);
       new SpringApplicationBuilder(ParentApplication.class).web(WebApplicationType.NONE).run(parentArgs);
     }
+  }
+
+  private static boolean hasChildParameter(String[] args) {
+    return Arrays.stream(args).anyMatch("child"::equalsIgnoreCase);
   }
   
   private static String[] filterArgs(String[] source, boolean parent) {
