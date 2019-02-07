@@ -2,6 +2,7 @@ package com.iskubailo.h2durabilitytest.parent;
 
 import java.time.Duration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -17,10 +18,10 @@ import org.springframework.web.client.RestTemplate;
 public class ParentApplication {
   
   @Bean
-  public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
+  public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder, @Value("${app.rest.timeout}") long restTimeout) {
     return restTemplateBuilder
-        .setConnectTimeout(Duration.ofSeconds(3))
-        .setReadTimeout(Duration.ofSeconds(3))
+        .setConnectTimeout(Duration.ofMillis(restTimeout))
+        .setReadTimeout(Duration.ofMillis(restTimeout))
         .build();
   }
 }
