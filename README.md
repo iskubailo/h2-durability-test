@@ -84,3 +84,7 @@ Example of command with rich parameters set to launch the test:
 ```
 java -jar h2-durability-test-0.0.1-SNAPSHOT.jar main:org.springframework.boot.loader.JarLauncher --server.port=8801 parent:--logging.file=data/parent.log child:--logging.file=data/child.log --app.rest.timeout=60000 stop-exit
 ```
+
+### Test results
+
+[See test results](results/README.md)
